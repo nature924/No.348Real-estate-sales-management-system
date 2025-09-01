@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.GouzhifangcanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.gouzhifangcan_name as gouzhifangcanName
+        ,a.fangchan_types as fangchanTypes
+        ,a.gouzhifangcan_photo as gouzhifangcanPhoto
+        ,a.gouzhifangcan_address as gouzhifangcanAddress
+        ,a.gouzhifangcan_mianjis as gouzhifangcanMianjis
+        ,a.gouzhifangcan_jiage as gouzhifangcanJiage
+        ,a.gouzhifangcan_quyu as gouzhifangcanQuyu
+        ,a.yonghu_id as yonghuId
+        ,a.yuangong_id as yuangongId
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.GouzhifangcanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.yonghu_delete as yonghuDelete
+        ,yuangong.yuangong_name as yuangongName
+        ,yuangong.yuangong_photo as yuangongPhoto
+        ,yuangong.yuangong_phone as yuangongPhone
+        ,yuangong.yuangong_email as yuangongEmail
+        ,yuangong.yuangong_delete as yuangongDelete
+
+        FROM gouzhifangcan  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+        left JOIN yuangong yuangong ON a.yuangong_id = yuangong.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.gouzhifangcanName != '' and params.gouzhifangcanName != null and params.gouzhifangcanName != 'null' ">
+                and a.gouzhifangcan_name like CONCAT('%',#{params.gouzhifangcanName},'%')
+            </if>
+            <if test="params.fangchanTypes != null and params.fangchanTypes != ''">
+                and a.fangchan_types = #{params.fangchanTypes}
+            </if>
+            <if test=" params.gouzhifangcanAddress != '' and params.gouzhifangcanAddress != null and params.gouzhifangcanAddress != 'null' ">
+                and a.gouzhifangcan_address like CONCAT('%',#{params.gouzhifangcanAddress},'%')
+            </if>
+            <if test="params.gouzhifangcanMianjisStart != null and params.gouzhifangcanMianjisStart != ''">
+                <![CDATA[  and a.gouzhifangcan_mianjis >= #{params.gouzhifangcanMianjisStart}   ]]>
+            </if>
+            <if test="params.gouzhifangcanMianjisEnd != null and params.gouzhifangcanMianjisEnd != ''">
+                <![CDATA[  and a.gouzhifangcan_mianjis <= #{params.gouzhifangcanMianjisEnd}   ]]>
+            </if>
+             <if test="params.gouzhifangcanMianjis != null and params.gouzhifangcanMianjis != ''">
+                and a.gouzhifangcan_mianjis = #{params.gouzhifangcanMianjis}
+             </if>
+            <if test="params.gouzhifangcanJiageStart != null and params.gouzhifangcanJiageStart != ''">
+                <![CDATA[  and a.gouzhifangcan_jiage >= #{params.gouzhifangcanJiageStart}   ]]>
+            </if>
+            <if test="params.gouzhifangcanJiageEnd != null and params.gouzhifangcanJiageEnd != ''">
+                <![CDATA[  and a.gouzhifangcan_jiage <= #{params.gouzhifangcanJiageEnd}   ]]>
+            </if>
+             <if test="params.gouzhifangcanJiage != null and params.gouzhifangcanJiage != ''">
+                and a.gouzhifangcan_jiage = #{params.gouzhifangcanJiage}
+             </if>
+            <if test=" params.gouzhifangcanQuyu != '' and params.gouzhifangcanQuyu != null and params.gouzhifangcanQuyu != 'null' ">
+                and a.gouzhifangcan_quyu like CONCAT('%',#{params.gouzhifangcanQuyu},'%')
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.yuangongId != null and params.yuangongId != ''">
+                and (
+                    a.yuangong_id = #{params.yuangongId}
+                )
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断客户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.yonghuDeleteStart != null  and params.yonghuDeleteStart != '' ">
+                <![CDATA[  and yonghu.yonghu_delete >= #{params.yonghuDeleteStart}   ]]>
+            </if>
+            <if test="params.yonghuDeleteEnd != null  and params.yonghuDeleteEnd != '' ">
+                <![CDATA[  and yonghu.yonghu_delete <= #{params.yonghuDeleteEnd}   ]]>
+            </if>
+            <if test="params.yonghuDelete != null  and params.yonghuDelete != '' ">
+                and yonghu.yonghu_delete = #{params.yonghuDelete}
+            </if>
+                <!-- 判断销售经理的id不为空 -->
+            <if test=" params.yuangongIdNotNull != '' and params.yuangongIdNotNull != null and params.yuangongIdNotNull != 'null' ">
+                and a.yuangong_id IS NOT NULL
+            </if>
+            <if test=" params.yuangongName != '' and params.yuangongName != null and params.yuangongName != 'null' ">
+                and yuangong.yuangong_name like CONCAT('%',#{params.yuangongName},'%')
+            </if>
+            <if test=" params.yuangongPhone != '' and params.yuangongPhone != null and params.yuangongPhone != 'null' ">
+                and yuangong.yuangong_phone like CONCAT('%',#{params.yuangongPhone},'%')
+            </if>
+            <if test=" params.yuangongEmail != '' and params.yuangongEmail != null and params.yuangongEmail != 'null' ">
+                and yuangong.yuangong_email like CONCAT('%',#{params.yuangongEmail},'%')
+            </if>
+            <if test="params.yuangongDeleteStart != null  and params.yuangongDeleteStart != '' ">
+                <![CDATA[  and yuangong.yuangong_delete >= #{params.yuangongDeleteStart}   ]]>
+            </if>
+            <if test="params.yuangongDeleteEnd != null  and params.yuangongDeleteEnd != '' ">
+                <![CDATA[  and yuangong.yuangong_delete <= #{params.yuangongDeleteEnd}   ]]>
+            </if>
+            <if test="params.yuangongDelete != null  and params.yuangongDelete != '' ">
+                and yuangong.yuangong_delete = #{params.yuangongDelete}
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
